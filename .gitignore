@@ -1,2 +1,6 @@
 main
 .vscode
+CMake*
+cmake*
+Makefile
+!CMakeLists.txt

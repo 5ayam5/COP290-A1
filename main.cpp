@@ -4,6 +4,7 @@
 using namespace cv;
 using namespace std;
 
+// add the clicked point to the points vector
 void mouseHandler(int event, int x, int y, int, void *data)
 {
 	if (event != EVENT_LBUTTONDOWN)
@@ -15,16 +16,19 @@ void mouseHandler(int event, int x, int y, int, void *data)
 		cout << "Press any key to continue\n";
 }
 
+// rearranges the points in cyclic order starting from the top left and moving clockwise
 void reorderPoints(vector<Point2f> &corners)
 {
 
 }
 
+// find the coordinates in the new perspective by taking the new lengths in rectangle to be mean of opposite sides(?)
 vector<Point2f> findMap(vector<Point2f> corners)
 {
 	return vector<Point2f>({{472, 52}, {800, 52}, {800, 830}, {472, 830}});
 }
 
+// utility function to compute and return homography 
 Mat computeHomography(vector<Point2f> &corners)
 {
 	reorderPoints(corners);
@@ -51,8 +55,8 @@ int main(int argc, char *argv[])
 	Mat perspectiveImg = Mat::zeros(img.rows, img.cols, img.type());
 	string windowName = "Select corners: " + string(argv[1]);
 
+	// wait for 4 mouse clicks and store the points in vector "corners"
 	vector<Point2f> corners;
-
 	while (true)
 	{
 		imshow(windowName, img);
@@ -65,10 +69,9 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	// compute homography matrix from the given corner points and display the resultant image
 	Mat h = computeHomography(corners);
-
 	warpPerspective(img, perspectiveImg, h, Size(img.rows, img.cols));
-	cout << h.rows << "\n";
 	imshow("works?", perspectiveImg);
 	waitKey(0);
 }
