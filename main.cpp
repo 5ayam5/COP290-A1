@@ -58,11 +58,7 @@ Mat computeHomography(vector<Point2f> &corners)
 
 Rect getRect(vector<Point2f> points)
 {
-<<<<<<< HEAD
-	if (points.size() < 3)
-=======
 	if (points.size() != 4)
->>>>>>> 283ebb16c84bef6c7f80c45b431878e601659f7f
 		return Rect();
 	int x = points[0].x, y = points[0].y;
 	return Rect(x, y, int(points[1].x - x), int(points[2].y - y));
