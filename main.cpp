@@ -16,12 +16,33 @@ void mouseHandler(int event, int x, int y, int, void *data)
 		cout << "Press any key to obtain projected image\n";
 }
 
+// rearranges the points in order to remove a bowtie formed if any
+/*
+bool pSortX(Point2f &a,Point2f &b){
+	return (a.x<b.x);
+}
+bool pSortY(Point2f &a,Point2f &b){
+	return (a.y<b.y);
+}*/
+
+int area(vector<Point2f> &corners){
+	return (corners[0].x*corners[1].y+corners[1].x*corners[2].y+corners[2].x*corners[3].y+corners[1].x*corners[0].y)-(corners[1].x*corners[0].y+corners[2].x*corners[1].y+corners[3].x*corners[2].y+corners[0].x*corners[3].y);
+}
 // rearranges the points in cyclic order starting from the top left and moving clockwise
 void reorderPoints(vector<Point2f> &corners)
 {
+	vector<Point2f> Coord;
 
+    for (int i = 0; i < 2; i++)
+    {        
+		Coord.push_back(corners[i]);
+	}
+	Coord.push_back(corners[3]);
+	Coord.push_back(corners[2]);
+	if (area(corners)<area(Coord)){
+		corners=Coord;
+	}
 }
-
 // find the coordinates in the new perspective by taking the new lengths in rectangle to be mean of opposite sides(?)
 vector<Point2f> findMap(vector<Point2f> corners)
 {
@@ -81,6 +102,10 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
+	//testing
+	cout<<corners<<endl;
+    reorderPoints(corners);
+	cout<<corners<<endl;
 
 	// compute homography matrix from the given corner points and store+display the resultant image
 	Mat h = computeHomography(corners);
