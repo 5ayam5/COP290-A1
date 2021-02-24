@@ -113,7 +113,8 @@ int main(int argc, char *argv[])
 	imwrite(fileName.substr(0, fileName.size() - 4) + "Projected.jpg", perspectiveImg);
 	imshow("Projected " + fileName, perspectiveImg);
 	cout << "Press any key to view cropped image\n";
-	waitKey(0);
+	int val=waitKey(0);
+	if (val==27){return 0;}
 	destroyWindow("Projected " + fileName);
 
 	// compute the cropped version of projected image
@@ -121,5 +122,6 @@ int main(int argc, char *argv[])
 	imwrite(fileName.substr(0, fileName.size() - 4) + "Cropped.jpg", croppedImg);
 	imshow("Cropped " + fileName, croppedImg);
 	cout << "Press any key to terminate\n";
-	waitKey(0);
+	val=waitKey(0);
+	if (val==27){return 0;}
 }
