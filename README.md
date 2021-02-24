@@ -3,6 +3,8 @@
 ### 2019CS50440 Mallika Prabhakar
 
 To run the program, run the following commands
->cmake CMakeLists.txt
->make all
->./main "imageName.jpg"
+```
+cmake CMakeLists.txt
+make all
+./main "imageName.jpg"
+```

@@ -16,15 +16,6 @@ void mouseHandler(int event, int x, int y, int, void *data)
 		cout << "Press any key to obtain projected image\n";
 }
 
-// rearranges the points in order to remove a bowtie formed if any
-/*
-bool pSortX(Point2f &a,Point2f &b){
-	return (a.x<b.x);
-}
-bool pSortY(Point2f &a,Point2f &b){
-	return (a.y<b.y);
-}*/
-
 int area(vector<Point2f> &corners){
 	return (corners[0].x*corners[1].y+corners[1].x*corners[2].y+corners[2].x*corners[3].y+corners[1].x*corners[0].y)-(corners[1].x*corners[0].y+corners[2].x*corners[1].y+corners[3].x*corners[2].y+corners[0].x*corners[3].y);
 }
@@ -69,7 +60,7 @@ int main(int argc, char *argv[])
 	// check if file address present
 	if (argc != 2)
 	{
-		cout << "Required one argument:\n./main <file name>\n";
+		cout << "Required one additional argument:\n./main <file name>\n";
 		return 0;
 	}
 
@@ -102,26 +93,34 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
-	//testing
-	cout<<corners<<endl;
-    reorderPoints(corners);
-	cout<<corners<<endl;
 
 	// compute homography matrix from the given corner points and store+display the resultant image
 	Mat h = computeHomography(corners);
 	warpPerspective(img, perspectiveImg, h, Size(img.rows, img.cols));
-	imwrite(fileName.substr(0, fileName.size() - 4) + "Projected.jpg", perspectiveImg);
 	imshow("Projected " + fileName, perspectiveImg);
-	cout << "Press any key to view cropped image\n";
+	cout << "Press any key to view cropped image and save this projected image, esc to quit\n";
 	int val=waitKey(0);
-	if (val==27){return 0;}
-	destroyWindow("Projected " + fileName);
+	if (val==27)
+		return 0;
+	try
+	{
+		destroyWindow("Projected " + fileName);
+		imwrite(fileName.substr(0, fileName.size() - 4) + "Projected.jpg", perspectiveImg);
+	}
+	catch (Exception &e)
+	{
+		return 0;
+	}
+	
 
 	// compute the cropped version of projected image
 	Mat croppedImg = perspectiveImg(getRect(findMap(corners)));
-	imwrite(fileName.substr(0, fileName.size() - 4) + "Cropped.jpg", croppedImg);
 	imshow("Cropped " + fileName, croppedImg);
-	cout << "Press any key to terminate\n";
-	val=waitKey(0);
-	if (val==27){return 0;}
+	cout << "Press any key to save image and terminate, esc to quit\n";
+	int val = waitKey(0);
+	if (val==27)
+		return 0;	
+	imwrite(fileName.substr(0, fileName.size() - 4) + "Cropped.jpg", croppedImg);
+
+	return 0;
 }
