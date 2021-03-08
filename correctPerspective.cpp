@@ -1,59 +1,9 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include "homography.hpp"
 
 using namespace cv;
 using namespace std;
-
-// add the clicked point to the points vector
-void mouseHandler(int event, int x, int y, int, void *data)
-{
-	if (event != EVENT_LBUTTONDOWN)
-		return;
-	vector<Point2f> *corners = (vector<Point2f> *)data;
-	corners->push_back(Point2f(x, y));
-	cout << "Clicked at " << x << ", " << y << "\n";
-	if (corners->size() == 4)
-		cout << "Press any key to obtain projected image\n";
-}
-
-int area(vector<Point2f> &corners){
-	return (corners[0].x*corners[1].y+corners[1].x*corners[2].y+corners[2].x*corners[3].y+corners[1].x*corners[0].y)-(corners[1].x*corners[0].y+corners[2].x*corners[1].y+corners[3].x*corners[2].y+corners[0].x*corners[3].y);
-}
-// rearranges the points in cyclic order starting from the top left and moving clockwise
-void reorderPoints(vector<Point2f> &corners)
-{
-	vector<Point2f> Coord;
-
-    for (int i = 0; i < 2; i++)
-    {        
-		Coord.push_back(corners[i]);
-	}
-	Coord.push_back(corners[3]);
-	Coord.push_back(corners[2]);
-	if (area(corners)<area(Coord)){
-		corners=Coord;
-	}
-}
-// find the coordinates in the new perspective by taking the new lengths in rectangle to be mean of opposite sides(?)
-vector<Point2f> findMap(vector<Point2f> corners)
-{
-	return vector<Point2f>({{472, 52}, {800, 52}, {800, 830}, {472, 830}});
-}
-
-// utility function to compute and return homography 
-Mat computeHomography(vector<Point2f> &corners)
-{
-	reorderPoints(corners);
-	return findHomography(corners, findMap(corners));
-}
-
-Rect getRect(vector<Point2f> points)
-{
-	if (points.size() != 4)
-		return Rect();
-	int x = points[0].x, y = points[0].y;
-	return Rect(x, y, int(points[1].x - x), int(points[2].y - y));
-}
 
 int main(int argc, char *argv[])
 {
@@ -99,8 +49,8 @@ int main(int argc, char *argv[])
 	warpPerspective(img, perspectiveImg, h, Size(img.rows, img.cols));
 	imshow("Projected " + fileName, perspectiveImg);
 	cout << "Press any key to view cropped image and save this projected image, esc to quit\n";
-	int val=waitKey(0);
-	if (val==27)
+	int val = waitKey(0);
+	if (val == 27)
 		return 0;
 	try
 	{
@@ -111,15 +61,14 @@ int main(int argc, char *argv[])
 	{
 		return 0;
 	}
-	
 
 	// compute the cropped version of projected image
 	Mat croppedImg = perspectiveImg(getRect(findMap(corners)));
 	imshow("Cropped " + fileName, croppedImg);
 	cout << "Press any key to save image and terminate, esc to quit\n";
-	int val = waitKey(0);
-	if (val==27)
-		return 0;	
+	val = waitKey(0);
+	if (val == 27)
+		return 0;
 	imwrite(fileName.substr(0, fileName.size() - 4) + "Cropped.jpg", croppedImg);
 
 	return 0;
