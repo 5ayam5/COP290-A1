@@ -56,6 +56,9 @@ int main(int argc, char *argv[])
 	vector<Point2f> cornersMap = findMap(corners);
 	warpAndCrop(refFrame, corners, cornersMap);
 	Mat prevFrame = refFrame;
+	int n;
+	cin >> n;
+	double M = 0;
 
 	while (true)
 	{
@@ -66,10 +69,16 @@ int main(int argc, char *argv[])
 		Mat queue, dynamic;
 		absdiff(refFrame, currFrame, queue);
 		absdiff(prevFrame, currFrame, dynamic);
-		imshow("test", dynamic);
+		threshold(queue, queue, 30, 1, 0);
+		// (sum(queue))[0] * 1.0 / (queue.rows * queue.cols)
+		threshold(dynamic, dynamic, n, 255, 0);
+		M = max(M, (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols * 255));
+		cout << (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols * 255) << '\n';
+		imshow("", dynamic);
 		waitKey(1);
 		prevFrame = currFrame;
 	}
+	cout << "M: " << M << '\n';
 
 	return 0;
 }
