@@ -7,6 +7,7 @@ using namespace std;
 
 const int QUEUE_THRESH = 30;
 const int BLUR_KERNEL_SIZE = 9;
+const int DYNAMIC_THRESH = 3;
 
 void blur(Mat &frame, int k)
 {
@@ -65,9 +66,7 @@ int main(int argc, char *argv[])
 	vector<Point2f> cornersMap = findMap(corners);
 	warpAndCrop(refFrame, corners, cornersMap);
 	Mat prevFrame = refFrame;
-	int n, frameNum = 0;
-	cin >> n;
-	double M = 0;
+	int frameNum = 0;
 
 	// loop for the complete video
 	while (true)
@@ -80,16 +79,14 @@ int main(int argc, char *argv[])
 		absdiff(refFrame, currFrame, queue);
 		absdiff(prevFrame, currFrame, dynamic);
 		threshold(queue, queue, QUEUE_THRESH, 1, 0);
-		// (sum(queue))[0] * 1.0 / (queue.rows * queue.cols)S
+		// (sum(queue))[0] * 1.0 / (queue.rows * queue.cols)
 		blur(dynamic, BLUR_KERNEL_SIZE);
-		threshold(dynamic, dynamic, n, 255, 0);
-		M = max(M, (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols * 255));
+		threshold(dynamic, dynamic, DYNAMIC_THRESH, 255, 0);
 		cout << (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols * 255) << '\n';
 		imshow("", dynamic);
 		waitKey(1);
 		prevFrame = currFrame;
 	}
-	cout << "M: " << M << '\n';
 
 	return 0;
 }
