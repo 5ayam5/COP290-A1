@@ -10,9 +10,9 @@ void mouseHandler(int event, int x, int y, int, void *data)
 		return;
 	vector<Point2f> *corners = (vector<Point2f> *)data;
 	corners->push_back(Point2f(x, y));
-	cout << "Clicked at " << x << ", " << y << "\n";
+	cerr << "Clicked at " << x << ", " << y << "\n";
 	if (corners->size() == 4)
-		cout << "Press any key to obtain projected image\n";
+		cerr << "Press any key to obtain projected image\n";
 }
 
 int area(vector<Point2f> &corners)
@@ -61,7 +61,7 @@ Rect getRect(vector<Point2f> points)
 vector<Point2f> getCorners(Mat &frame, string windowName)
 {
 	vector<Point2f> corners;
-	cout << "Click on the four corners of the road\n";
+	cerr << "Click on the four corners of the road\n";
 	while (true)
 	{
 		imshow(windowName, frame);

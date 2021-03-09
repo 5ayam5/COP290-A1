@@ -34,10 +34,14 @@ void warpAndCrop(Mat &frame, vector<Point2f> corners, vector<Point2f> cornersMap
 
 int main(int argc, char *argv[])
 {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
 	// check if file address present
 	if (argc != 2)
 	{
-		cout << "Required one additional argument:\n./main <file name>\n";
+		cerr << "Required one additional argument:\n./main <file name>\n";
 		return 0;
 	}
 
@@ -46,7 +50,7 @@ int main(int argc, char *argv[])
 	VideoCapture video(fileName);
 	if (video.isOpened() == false || fileName.substr(fileName.size() - 3, 3) != "mp4")
 	{
-		cout << "Could not load file or file not of mp4 format, please check the file and try again :(\n";
+		cerr << "Could not load file or file not of mp4 format, please check the file and try again :(\n";
 		return 0;
 	}
 
@@ -54,19 +58,21 @@ int main(int argc, char *argv[])
 	Mat refFrame = getNextFrame(video);
 	if (refFrame.data == NULL)
 	{
-		cout << "Error in reading the video file, please check the file and try again.\n";
+		cerr << "Error in reading the video file, please check the file and try again.\n";
 		return 0;
 	}
 	vector<Point2f> corners = getCorners(refFrame, "Select corners");
 	if (corners.size() != 4)
 	{
-		cout << "Escape key pressed, aborting execution\n";
+		cerr << "Escape key pressed, aborting execution\n";
 		return 0;
 	}
 	vector<Point2f> cornersMap = findMap(corners);
 	warpAndCrop(refFrame, corners, cornersMap);
 	Mat prevFrame = refFrame;
-	int frameNum = 0;
+	int frameNum = 1;
+
+	cout << "framenum, queue density, dynamic density\n";
 
 	// loop for the complete video
 	while (true)
@@ -75,17 +81,20 @@ int main(int argc, char *argv[])
 		if (currFrame.data == NULL)
 			break;
 		warpAndCrop(currFrame, corners, cornersMap);
+
 		Mat queue, dynamic;
+
 		absdiff(refFrame, currFrame, queue);
-		absdiff(prevFrame, currFrame, dynamic);
 		threshold(queue, queue, QUEUE_THRESH, 1, 0);
-		// (sum(queue))[0] * 1.0 / (queue.rows * queue.cols)
+
+		absdiff(prevFrame, currFrame, dynamic);
 		blur(dynamic, BLUR_KERNEL_SIZE);
-		threshold(dynamic, dynamic, DYNAMIC_THRESH, 255, 0);
-		cout << (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols * 255) << '\n';
-		imshow("", dynamic);
-		waitKey(1);
+		threshold(dynamic, dynamic, DYNAMIC_THRESH, 1, 0);
+
+		cout << frameNum << ',' << (sum(queue))[0] * 1.0 / (queue.rows * queue.cols) << ',' << (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols) << '\n';
+
 		prevFrame = currFrame;
+		++frameNum;
 	}
 
 	return 0;
