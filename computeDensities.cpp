@@ -5,7 +5,23 @@
 using namespace cv;
 using namespace std;
 
-const QUEUE_THRESH = 30;
+const int QUEUE_THRESH = 30;
+
+void blur(Mat &frame){
+	Mat blurFrame;
+	for ( int i = 1; i < 20; i = i + 2 )
+		{ 
+			GaussianBlur(frame, blurFrame, Size( i, i ), 0, 0 );
+			/*
+			if( display_dst( DELAY_BLUR ) != 0 ) 
+			{ 
+				return; 
+			}*/
+	}
+	frame=blurFrame;
+}
+
+
 
 Mat getNextFrame(VideoCapture &vid)
 {
@@ -73,7 +89,8 @@ int main(int argc, char *argv[])
 		absdiff(refFrame, currFrame, queue);
 		absdiff(prevFrame, currFrame, dynamic);
 		threshold(queue, queue, QUEUE_THRESH, 1, 0);
-		// (sum(queue))[0] * 1.0 / (queue.rows * queue.cols)
+		// (sum(queue))[0] * 1.0 / (queue.rows * queue.cols)S
+		blur(dynamic);
 		threshold(dynamic, dynamic, n, 255, 0);
 		M = max(M, (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols * 255));
 		cout << (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols * 255) << '\n';
