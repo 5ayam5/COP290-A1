@@ -6,9 +6,9 @@ using namespace cv;
 using namespace std;
 
 const int QUEUE_THRESH = 30;
-const int BLUR_KERNEL_SIZE = 9;
-const int DYNAMIC_THRESH = 3;
-const double DIFF_THRESH = 0.4;
+const int BLUR_KERNEL_SIZE = 15;
+const int DYNAMIC_THRESH = 9;
+const int QUEUE = 3;
 
 void blur(Mat &frame, int k)
 {
@@ -72,7 +72,10 @@ int main(int argc, char *argv[])
 	warpAndCrop(refFrame, corners, cornersMap);
 	Mat prevFrame = refFrame;
 	int frameNum = 1;
-	double prevSum = 0;
+	double movingSum = 0;
+	queue<double> prevSums;
+	for (int i = 0; i < QUEUE; ++i)
+		prevSums.push(0);
 
 	cout << "framenum, queue density, dynamic density\n";
 
@@ -91,17 +94,21 @@ int main(int argc, char *argv[])
 
 		absdiff(prevFrame, currFrame, dynamic);
 		blur(dynamic, BLUR_KERNEL_SIZE);
+		imshow("", dynamic);
+		waitKey(1);
 		threshold(dynamic, dynamic, DYNAMIC_THRESH, 1, 0);
 
 		double currSum = (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols);
-		if (abs(currSum - prevSum) < DIFF_THRESH)
-			prevSum = (currSum + prevSum) / 2;
-		else
-			prevSum = currSum;
-		cout << frameNum << ',' << (sum(queue))[0] * 1.0 / (queue.rows * queue.cols) << ',' << prevSum << '\n';
+		movingSum += currSum - prevSums.front();
+		double qVal = (sum(queue))[0] * 1.0 / (queue.rows * queue.cols), dVal = movingSum / QUEUE;
+		assert(dVal - qVal < 0.1);
+		cout << frameNum << ',' << qVal << ',' << dVal << '\n';
 
 		prevFrame = currFrame;
-		prevSum = currSum;
+		prevSums.push(currSum);
+		prevSums.pop();
+
+
 		++frameNum;
 	}
 
