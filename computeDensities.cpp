@@ -6,11 +6,11 @@ using namespace cv;
 using namespace std;
 
 const int QUEUE_THRESH = 30;
+const int BLUR_KERNEL_SIZE = 9;
 
 void blur(Mat &frame, int k)
 {
 	assert(k & 1);
-	Mat blurFrame;
 	GaussianBlur(frame, frame, Size(k, k), 0, 0);
 }
 
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 		absdiff(prevFrame, currFrame, dynamic);
 		threshold(queue, queue, QUEUE_THRESH, 1, 0);
 		// (sum(queue))[0] * 1.0 / (queue.rows * queue.cols)S
-		blur(dynamic, 9);
+		blur(dynamic, BLUR_KERNEL_SIZE);
 		threshold(dynamic, dynamic, n, 255, 0);
 		M = max(M, (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols * 255));
 		cout << (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols * 255) << '\n';
