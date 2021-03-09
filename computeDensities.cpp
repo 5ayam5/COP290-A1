@@ -5,6 +5,8 @@
 using namespace cv;
 using namespace std;
 
+const QUEUE_THRESH = 30;
+
 Mat getNextFrame(VideoCapture &vid)
 {
 	Mat frame;
@@ -31,16 +33,16 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
+	// attempt to open video
 	string fileName = argv[1];
-
 	VideoCapture video(fileName);
-
 	if (video.isOpened() == false || fileName.substr(fileName.size() - 3, 3) != "mp4")
 	{
 		cout << "Could not load file or file not of mp4 format, please check the file and try again :(\n";
 		return 0;
 	}
 
+	// initialise variables and read the first frame
 	Mat refFrame = getNextFrame(video);
 	if (refFrame.data == NULL)
 	{
@@ -56,10 +58,11 @@ int main(int argc, char *argv[])
 	vector<Point2f> cornersMap = findMap(corners);
 	warpAndCrop(refFrame, corners, cornersMap);
 	Mat prevFrame = refFrame;
-	int n;
+	int n, frameNum = 0;
 	cin >> n;
 	double M = 0;
 
+	// loop for the complete video
 	while (true)
 	{
 		Mat currFrame = getNextFrame(video);
@@ -69,7 +72,7 @@ int main(int argc, char *argv[])
 		Mat queue, dynamic;
 		absdiff(refFrame, currFrame, queue);
 		absdiff(prevFrame, currFrame, dynamic);
-		threshold(queue, queue, 30, 1, 0);
+		threshold(queue, queue, QUEUE_THRESH, 1, 0);
 		// (sum(queue))[0] * 1.0 / (queue.rows * queue.cols)
 		threshold(dynamic, dynamic, n, 255, 0);
 		M = max(M, (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols * 255));
