@@ -10,7 +10,6 @@ const int QUEUE_THRESH = 30;
 void blur(Mat &frame, int k)
 {
 	assert(k & 1);
-	Mat blurFrame;
 	GaussianBlur(frame, frame, Size(k, k), 0, 0);
 }
 
