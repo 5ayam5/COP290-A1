@@ -8,6 +8,7 @@ using namespace std;
 const int QUEUE_THRESH = 30;
 const int BLUR_KERNEL_SIZE = 9;
 const int DYNAMIC_THRESH = 3;
+const double DIFF_THRESH = 0.4;
 
 void blur(Mat &frame, int k)
 {
@@ -71,6 +72,7 @@ int main(int argc, char *argv[])
 	warpAndCrop(refFrame, corners, cornersMap);
 	Mat prevFrame = refFrame;
 	int frameNum = 1;
+	double prevSum = 0;
 
 	cout << "framenum, queue density, dynamic density\n";
 
@@ -91,9 +93,15 @@ int main(int argc, char *argv[])
 		blur(dynamic, BLUR_KERNEL_SIZE);
 		threshold(dynamic, dynamic, DYNAMIC_THRESH, 1, 0);
 
-		cout << frameNum << ',' << (sum(queue))[0] * 1.0 / (queue.rows * queue.cols) << ',' << (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols) << '\n';
+		double currSum = (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols);
+		if (abs(currSum - prevSum) < DIFF_THRESH)
+			prevSum = (currSum + prevSum) / 2;
+		else
+			prevSum = currSum;
+		cout << frameNum << ',' << (sum(queue))[0] * 1.0 / (queue.rows * queue.cols) << ',' << prevSum << '\n';
 
 		prevFrame = currFrame;
+		prevSum = currSum;
 		++frameNum;
 	}
 
