@@ -5,10 +5,10 @@
 using namespace cv;
 using namespace std;
 
-const int QUEUE_THRESH = 30;
-const int BLUR_KERNEL_SIZE = 15;
-const int DYNAMIC_THRESH = 9;
-const int QUEUE = 3;
+const int QUEUE_THRESH = 15;
+const int BLUR_KERNEL_SIZE = 45;
+const int DYNAMIC_THRESH = 6;
+const int QUEUE = 6;
 
 void blur(Mat &frame, int k)
 {
@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
 		cerr << "Could not load file or file not of mp4 format, please check the file and try again :(\n";
 		return 0;
 	}
+	double fps = video.get(CAP_PROP_FPS);
 
 	// initialise variables and read the first frame
 	Mat refFrame = getNextFrame(video);
@@ -77,7 +78,7 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < QUEUE; ++i)
 		prevSums.push(0);
 
-	cout << "framenum, queue density, dynamic density\n";
+	cout << "time (in seconds),queue density,dynamic density\n";
 
 	// loop for the complete video
 	while (true)
@@ -94,15 +95,12 @@ int main(int argc, char *argv[])
 
 		absdiff(prevFrame, currFrame, dynamic);
 		blur(dynamic, BLUR_KERNEL_SIZE);
-		imshow("", dynamic);
-		waitKey(1);
 		threshold(dynamic, dynamic, DYNAMIC_THRESH, 1, 0);
 
 		double currSum = (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols);
 		movingSum += currSum - prevSums.front();
 		double qVal = (sum(queue))[0] * 1.0 / (queue.rows * queue.cols), dVal = movingSum / QUEUE;
-		assert(dVal - qVal < 0.1);
-		cout << frameNum << ',' << qVal << ',' << dVal << '\n';
+		cout << frameNum * 1.0 / fps << ',' << qVal << ',' << dVal << '\n';
 
 		prevFrame = currFrame;
 		prevSums.push(currSum);

@@ -7,5 +7,6 @@ Makefile
 !CMakeLists.txt
 *Cropped.jpg
 *Projected.jpg
-trafficvideo.*
+!trafficvideo.mp4
+trafficvideo*
 .ipynb_checkpoints
