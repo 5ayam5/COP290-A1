@@ -1,37 +1,11 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
-#include "homography.hpp"
+#include "densities.hpp"
 
 using namespace cv;
 using namespace std;
 
-const int QUEUE_THRESH = 15;
-const int BLUR_KERNEL_SIZE = 45;
-const int DYNAMIC_THRESH = 6;
 const int QUEUE = 6;
-
-void blur(Mat &frame, int k)
-{
-	assert(k & 1);
-	GaussianBlur(frame, frame, Size(k, k), 0, 0);
-}
-
-Mat getNextFrame(VideoCapture &vid)
-{
-	Mat frame;
-	if (vid.read(frame))
-	{
-		cvtColor(frame, frame, COLOR_BGR2GRAY);
-		return frame;
-	}
-	return Mat();
-}
-
-void warpAndCrop(Mat &frame, vector<Point2f> corners, vector<Point2f> cornersMap)
-{
-	warpPerspective(frame, frame, computeHomography(corners), Size(frame.rows, frame.cols));
-	frame = frame(getRect(cornersMap));
-}
 
 int main(int argc, char *argv[])
 {
@@ -88,18 +62,11 @@ int main(int argc, char *argv[])
 			break;
 		warpAndCrop(currFrame, corners, cornersMap);
 
-		Mat queue, dynamic;
+		Mat queue = computeQueue(refFrame, currFrame), dynamic = computeDynamic(prevFrame, currFrame);
 
-		absdiff(refFrame, currFrame, queue);
-		threshold(queue, queue, QUEUE_THRESH, 1, 0);
-
-		absdiff(prevFrame, currFrame, dynamic);
-		blur(dynamic, BLUR_KERNEL_SIZE);
-		threshold(dynamic, dynamic, DYNAMIC_THRESH, 1, 0);
-
-		double currSum = (sum(dynamic))[0] * 1.0 / (queue.rows * queue.cols);
+		double currSum = sum(dynamic)[0] * 1.0 / (queue.rows * queue.cols);
 		movingSum += currSum - prevSums.front();
-		double qVal = (sum(queue))[0] * 1.0 / (queue.rows * queue.cols), dVal = movingSum / QUEUE;
+		double qVal = sum(queue)[0] * 1.0 / (queue.rows * queue.cols), dVal = movingSum / QUEUE;
 		cout << frameNum * 1.0 / fps << ',' << qVal << ',' << dVal << '\n';
 
 		prevFrame = currFrame;
