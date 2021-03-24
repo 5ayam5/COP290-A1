@@ -2,7 +2,7 @@
 ## 2019CS10399 Sayam Sethi ##
 ## 2019CS50440 Mallika Prabhakar ##
 
-### Subtask 1 ###
+# Subtask 1 #
 To run the program, do the following:
 ## Step 1: Check Dependencies ##
 1. [CMake](https://cmake.org/install/)
@@ -30,7 +30,7 @@ If everything has gone well till now, you will be able to see the image in a win
 The two images will be saved as `<imageName>Projected.jpg` and `<imageName>Cropped.jpg` in the same directory as the original image.
 
 
-### Subtask 2 ###
+# Subtask 2 #
 To run the program, do the following:
 ## Step 1: Check Dependencies ##
 1. [CMake](https://cmake.org/install/)
