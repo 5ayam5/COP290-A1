@@ -1,5 +1,6 @@
 computeDensities
 computeDensities_subsampling
+computeDensities_spatialThreading
 correctPerspective
 .vscode
 CMake*
