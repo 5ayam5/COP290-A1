@@ -37,16 +37,16 @@ void reorderPoints(vector<Point2f> &corners)
 }
 
 // find the coordinates in the new perspective by taking the new lengths in rectangle to be mean of opposite sides(?)
-vector<Point2f> findMap(vector<Point2f> &corners)
+vector<Point2f> findMap(vector<Point2f> &corners, float scale = 1)
 {
-	return vector<Point2f>({{472, 52}, {800, 52}, {800, 830}, {472, 830}});
+	return vector<Point2f>({{472 / scale, 52 / scale}, {800 / scale, 52 / scale}, {800 / scale, 830 / scale}, {472 / scale, 830 / scale}});
 }
 
 // utility function to compute and return homography
-Mat computeHomography(vector<Point2f> &corners)
+Mat computeHomography(vector<Point2f> &corners, float scale = 1)
 {
 	reorderPoints(corners);
-	return findHomography(corners, findMap(corners));
+	return findHomography(corners, findMap(corners, scale));
 }
 
 Rect getRect(vector<Point2f> points)

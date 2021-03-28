@@ -9,11 +9,13 @@ const int BLUR_KERNEL_SIZE = 45;
 const int DYNAMIC_THRESH = 6;
 
 // return the next frame in the video in grayscale
-Mat getNextFrame(VideoCapture &vid)
+Mat getNextFrame(VideoCapture &vid, float scale = 0)
 {
 	Mat frame;
 	if (vid.read(frame))
 	{
+		if (scale != 0)
+			resize(frame, frame, Size(), 1.0 / scale, 1.0 / scale, INTER_AREA);
 		cvtColor(frame, frame, COLOR_BGR2GRAY);
 		return frame;
 	}
@@ -21,10 +23,9 @@ Mat getNextFrame(VideoCapture &vid)
 }
 
 // warp and crop the image
-void warpAndCrop(Mat &frame, vector<Point2f> corners, vector<Point2f> cornersMap)
+void warpAndCrop(Mat &frame, vector<Point2f> corners, vector<Point2f> cornersMap, float scale = 1)
 {
-	warpPerspective(frame, frame, computeHomography(corners), Size(frame.rows, frame.cols));
-	frame = frame(getRect(cornersMap));
+	warpPerspective(frame, frame, computeHomography(corners, scale), getRect(cornersMap).size());
 }
 
 // assert and blur

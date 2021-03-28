@@ -5,8 +5,6 @@
 using namespace cv;
 using namespace std;
 
-const int QUEUE = 6;
-
 int main(int argc, char *argv[])
 {
 	ios_base::sync_with_stdio(false);
@@ -29,67 +27,47 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 	double fps = video.get(CAP_PROP_FPS);
+	int frameNum = 1, x;
+	cerr << "Scaling parameter: ";
+	cin >> x;
 
 	// initialise variables and read the first frame
-	Mat refFrameI = getNextFrame(video);
-	if (refFrameI.data == NULL)
+	Mat refFrame = getNextFrame(video, x);
+	if (refFrame.data == NULL)
 	{
 		cerr << "Error in reading the video file, please check the file and try again.\n";
 		return 0;
 	}
-	vector<Point2f> corners = getCorners(refFrameI, "Select corners");
+
+	vector<Point2f> corners = getCorners(refFrame, "Select corners");
 	if (corners.size() != 4)
 	{
 		cerr << "Escape key pressed, aborting execution\n";
 		return 0;
 	}
 
+	vector<Point2f> cornersMap = findMap(corners, x);
+	warpAndCrop(refFrame, corners, cornersMap, x);
 
-	vector<Point2f> cornersMap = findMap(corners);
-	warpAndCrop(refFrameI, corners, cornersMap);
-
-		//resize refFrame
-	Mat refFrame;
-	resize(refFrameI, refFrame, Size(640, 480), 0, 0, INTER_AREA);
-	
-
-
-	Mat prevFrame = refFrame;
-	int frameNum = 1;
-	double movingSum = 0;
-	queue<double> prevSums;
-	for (int i = 0; i < QUEUE; ++i)
-		prevSums.push(0);
-
-	cout << "time (in seconds),queue density,dynamic density\n";
+	auto t = chrono::high_resolution_clock::now();
+	cout << "time (in seconds),queue density\n";
 
 	// loop for the complete video
 	while (true)
 	{
-		Mat currFrameI = getNextFrame(video);
-		if (currFrameI.data == NULL)
+		Mat currFrame = getNextFrame(video, x);
+		if (currFrame.data == NULL)
 			break;
-		warpAndCrop(currFrameI, corners, cornersMap);
+		warpAndCrop(currFrame, corners, cornersMap, x);
 
-//resize currFrame
-		Mat currFrame;
-		resize(currFrameI, currFrame, Size(640, 480), 0, 0, INTER_AREA);		
-
-
-		Mat queue = computeQueue(refFrame, currFrame), dynamic = computeDynamic(prevFrame, currFrame);
-
-		double currSum = sum(dynamic)[0] * 1.0 / (queue.rows * queue.cols);
-		movingSum += currSum - prevSums.front();
-		double qVal = sum(queue)[0] * 1.0 / (queue.rows * queue.cols), dVal = movingSum / QUEUE;
-		cout << frameNum * 1.0 / fps << ',' << qVal << ',' << dVal << '\n';
-
-		prevFrame = currFrame;
-		prevSums.push(currSum);
-		prevSums.pop();
-
+		Mat queue = computeQueue(refFrame, currFrame);
+		double qVal = sum(queue)[0] * 1.0 / (queue.rows * queue.cols);
+		cout << frameNum * 1.0 / fps << ',' << qVal << '\n';
 
 		++frameNum;
 	}
+
+	cout << "Time taken: " << chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - t).count() / 1000.0;
 
 	return 0;
 }

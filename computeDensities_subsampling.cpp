@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 		Mat queue = computeQueue(refFrame, currFrame);
 
 		double qVal = sum(queue)[0] * 1.0 / (queue.rows * queue.cols);
-		for (int idx = frameNum; idx < min(totFrames, frameNum + x); ++idx)
+		for (int idx = frameNum; idx < min(totFrames - 1, frameNum + x); ++idx)
 			cout << (idx + 1) * 1.0 / fps << ',' << qVal << '\n';
 
 		for (int i = 1; i < x; ++i)
