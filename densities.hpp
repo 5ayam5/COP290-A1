@@ -15,7 +15,7 @@ Mat getNextFrame(VideoCapture &vid, float scale = 0)
 	if (vid.read(frame))
 	{
 		if (scale != 0)
-			resize(frame, frame, Size(), 1.0 / scale, 1.0 / scale, INTER_AREA);
+			resize(frame, frame, Size(), 1.0 / scale, 1.0 / scale);
 		cvtColor(frame, frame, COLOR_BGR2GRAY);
 		return frame;
 	}
@@ -25,7 +25,8 @@ Mat getNextFrame(VideoCapture &vid, float scale = 0)
 // warp and crop the image
 void warpAndCrop(Mat &frame, vector<Point2f> corners, vector<Point2f> cornersMap, float scale = 1)
 {
-	warpPerspective(frame, frame, computeHomography(corners, scale), getRect(cornersMap).size());
+	warpPerspective(frame, frame, computeHomography(corners, scale), frame.size());
+	frame = frame(getRect(cornersMap));
 }
 
 // assert and blur

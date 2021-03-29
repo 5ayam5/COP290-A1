@@ -27,7 +27,8 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 	double fps = video.get(CAP_PROP_FPS);
-	int frameNum = 1, x;
+	int frameNum = 1;
+	float x;
 	cerr << "Scaling parameter: ";
 	cin >> x;
 

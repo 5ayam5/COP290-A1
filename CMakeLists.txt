@@ -19,5 +19,8 @@ target_link_libraries(computeDensities_resolution PRIVATE ${OpenCV_LIBS})
 add_executable(computeDensities_spatialThreading computeDensities_spatialThreading.cpp)
 target_link_libraries(computeDensities_spatialThreading PRIVATE ${OpenCV_LIBS} Threads::Threads)
 
+add_executable(computeDensities_temporalThreading computeDensities_temporalThreading.cpp)
+target_link_libraries(computeDensities_temporalThreading PRIVATE ${OpenCV_LIBS} Threads::Threads)
+
 add_executable(correctPerspective correctPerspective.cpp)
 target_link_libraries(correctPerspective PRIVATE ${OpenCV_LIBS})

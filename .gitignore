@@ -2,6 +2,7 @@ computeDensities
 computeDensities_subsampling
 computeDensities_resolution
 computeDensities_spatialThreading
+computeDensities_temporalThreading
 correctPerspective
 .vscode
 CMake*

@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	cout << "time (in seconds),queue density\n";
 
 	// loop for the complete video
-	while (frameNum < totFrames)
+	while (frameNum < totFrames - 1)
 	{
 		Mat currFrame = getNextFrame(video);
 		if (currFrame.data == NULL)
