@@ -1,6 +1,8 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 
+\newcommand\ddfrac[2]{{\displaystyle\frac{\displaystyle #1}{\displaystyle #2}}}
+
 \title{COP290-A1}
 \author{Sayam Sethi 2019CS10399 \\ Mallika Prabhakar 2019CS50440 }
 \date{March 2021}
@@ -16,22 +18,23 @@
 %define your utility and runtime metrics here
 For any software, we need to consider a lot of aspects like accuracy, hardware resources, privacy, latency, etc. Improving one aspect might hamper the second aspect hence there is a trade-off. To analyse this trade-off, we have to use certain metrics to compare different approaches and optimisations. The utility function and runtime metric used for this assignment are described as follows-
 
-\subsection{Utility Function}
-A utility function is considered which takes into account both deviation in error and execution time into account.
+\subsection{Penalty Function}
+A penalty function is considered which takes into account both deviation in error and execution time into account.
 
-\textbf{Specifications:}
-% use math and type out the utility func here
-
-err in the function refers to the relative error in the measurement of queue densities with respect
+\textbf{Specifications:} The penalty function was made keeping in account that higher reduction in runtime leads to a larger error and hence, if the runtime reduction is more, the contribution of the error to the function should be reduced. The final function considered was:
+\begin{center}
+    $\ddfrac{1 + \mathit{mean}(\mathit{square}(10000\cdot\mathit{diff}(\mathit{queueDensityBaseline}, \mathit{queueDensityCurr})))}{1 + \frac{\mathit{baseRuntime} - \mathit{currentRuntime}}{\mathit{baseRuntime}}}$
+\end{center}
+Initially many variations were explored in which the numerator and denominator were raised to different powers, however, they led to highly similar graphs and not much difference was observed in the relative trends. Hence, the simple ratio was finally considered.
 
 \subsection{Runtime Metric}
-
-
-\textbf{Specifications: }
+% @TODO
+\textbf{Specifications:}
 
 
 \section{Methods}
-%describe what methods you could implement from the above list with what parameters
+% describe what methods you could implement from the above list with what parameters
+% @TODO will do this later, if possible can you do it? Will do the graphs pehle
 Following methods are the ones which we implemented and considered with respect to the sub-task 2 implementation-
 
 \subsection{Sub-sampling frames}
@@ -40,11 +43,12 @@ Following methods are the ones which we implemented and considered with respect 
 \subsection{Temporal work splitting}
 
 \section{Trade-off analysis}
-%put tables and graphs and describe which method gave what utility-vs-runtime trade-off and why do you think it behaved in certain ways
 While building a software, our purpose is to not only maximise the accuracy but also the other user and hardware specific features like latency in computation, temperature of the CPU unit and other hardware, security and privacy of data, etc. For this assignment, we have mainly considered the computation speed and accuracy for trade-off analysis.
+\subsection{Sub-sampling frames}
+Intuitively, the runtime is expected to decrease with a larger sumsampling parameter. Indeed, this is what actually happens
 
 
-%if you see it then start adding random stuff zzz
+% if you see it then start adding random stuff zzz
 
 \end{document}
 %nice yay
