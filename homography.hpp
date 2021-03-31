@@ -3,6 +3,8 @@
 using namespace cv;
 using namespace std;
 
+Mat H = Mat();
+
 // add the clicked point to the points vector
 void mouseHandler(int event, int x, int y, int, void *data)
 {
@@ -45,8 +47,10 @@ vector<Point2f> findMap(vector<Point2f> &corners, float scale = 1)
 // utility function to compute and return homography
 Mat computeHomography(vector<Point2f> &corners, float scale = 1)
 {
+	if (H.data != NULL)
+		return H;
 	reorderPoints(corners);
-	return findHomography(corners, findMap(corners, scale));
+	return H = findHomography(corners, findMap(corners, scale));
 }
 
 Rect getRect(vector<Point2f> points)

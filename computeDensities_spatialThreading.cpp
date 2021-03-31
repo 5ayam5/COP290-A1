@@ -6,12 +6,12 @@
 using namespace cv;
 using namespace std;
 
-vector<double> qVals;
 struct ThreadArgs
 {
 	static int NUM_THREADS;
 	static Mat *frame;
 	int thread_id;
+	double qVal;
 	Mat refFrame;
 };
 int ThreadArgs::NUM_THREADS;
@@ -36,7 +36,7 @@ void *computeQueueThread(void *arg)
 
 	int i = threadArgs->thread_id;
 	Mat frame = getSegment(*(threadArgs->frame), i), queue = computeQueue(threadArgs->refFrame, frame);
-	qVals[threadArgs->thread_id] = sum(queue)[0] * 1.0 / (queue.rows * queue.cols);
+	threadArgs->qVal = sum(queue)[0] * 1.0;
 
 	pthread_exit(NULL);
 }
@@ -48,9 +48,9 @@ int main(int argc, char *argv[])
 	cout.tie(NULL);
 
 	// check if file address present
-	if (argc != 2)
+	if (argc != 3)
 	{
-		cerr << "Required one additional argument:\n./main <file name>\n";
+		cerr << "Required two additional argument:\n./<program name> <file name> <parameter>\n";
 		return 0;
 	}
 
@@ -71,22 +71,18 @@ int main(int argc, char *argv[])
 		cerr << "Error in reading the video file, please check the file and try again.\n";
 		return 0;
 	}
-	vector<Point2f> corners = getCorners(refFrame, "Select corners");
-	if (corners.size() != 4)
-	{
-		cerr << "Escape key pressed, aborting execution\n";
-		return 0;
-	}
+	vector<Point2f> corners({{998, 222}, {1268, 223}, {1520, 1015}, {384, 1015}});
 	vector<Point2f> cornersMap = findMap(corners);
+	cerr << "Press enter key\n";
+	imshow("", refFrame);
+	waitKey(0);
+	destroyAllWindows();
 	warpAndCrop(refFrame, corners, cornersMap);
 	int frameNum = 0;
-
-	cerr << "Number of threads: ";
-	cin >> ThreadArgs::NUM_THREADS;
+	ThreadArgs::NUM_THREADS = stoi(argv[2]);
 	auto t = chrono::high_resolution_clock::now();
 
 	pthread_t threads[ThreadArgs::NUM_THREADS];
-	qVals.resize(ThreadArgs::NUM_THREADS);
 	vector<ThreadArgs> threadArgs(ThreadArgs::NUM_THREADS);
 	for (int i = 0; i < ThreadArgs::NUM_THREADS; ++i)
 	{
@@ -114,17 +110,18 @@ int main(int argc, char *argv[])
 			}
 		}
 
+		double qVal = 0;
 		for (int i = 0; i < ThreadArgs::NUM_THREADS; ++i)
 		{
 			int rc = pthread_join(threads[i], NULL);
+			qVal += threadArgs[i].qVal;
 			if (rc)
 			{
 				cerr << "Unable to join thread " << i << ", frame number: " << frameNum << '\n';
 				return 0;
 			}
 		}
-
-		cout << ++frameNum * 1.0 / fps << ',' << accumulate(qVals.begin(), qVals.end(), (double)0) / ThreadArgs::NUM_THREADS << '\n';
+		cout << ++frameNum * 1.0 / fps << ',' << qVal / (currFrame.size().width * currFrame.size().height) << '\n';
 	}
 
 	cout << "Time taken: " << chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - t).count() / 1000.0;

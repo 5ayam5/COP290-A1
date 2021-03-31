@@ -12,9 +12,9 @@ int main(int argc, char *argv[])
 	cout.tie(NULL);
 
 	// check if file address present
-	if (argc != 2)
+	if (argc != 3)
 	{
-		cerr << "Required one additional argument:\n./main <file name>\n";
+		cerr << "Required two additional argument:\n./<program name> <file name> <parameter>\n";
 		return 0;
 	}
 
@@ -28,9 +28,7 @@ int main(int argc, char *argv[])
 	}
 	double fps = video.get(CAP_PROP_FPS);
 	int frameNum = 1;
-	float x;
-	cerr << "Scaling parameter: ";
-	cin >> x;
+	float x = stof(argv[2]);
 
 	// initialise variables and read the first frame
 	Mat refFrame = getNextFrame(video, x);
@@ -40,14 +38,12 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	vector<Point2f> corners = getCorners(refFrame, "Select corners");
-	if (corners.size() != 4)
-	{
-		cerr << "Escape key pressed, aborting execution\n";
-		return 0;
-	}
-
+	vector<Point2f> corners({{998 / x, 222 / x}, {1268 / x, 223 / x}, {1520 / x, 1015 / x}, {384 / x, 1015 / x}});
 	vector<Point2f> cornersMap = findMap(corners, x);
+	cerr << "Press enter key\n";
+	imshow("", refFrame);
+	waitKey(0);
+	destroyAllWindows();
 	warpAndCrop(refFrame, corners, cornersMap, x);
 
 	auto t = chrono::high_resolution_clock::now();

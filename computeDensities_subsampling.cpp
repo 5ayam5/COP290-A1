@@ -12,9 +12,9 @@ int main(int argc, char *argv[])
 	cout.tie(NULL);
 
 	// check if file address present
-	if (argc != 2)
+	if (argc != 3)
 	{
-		cerr << "Required one additional argument:\n./main <file name>\n";
+		cerr << "Required two additional argument:\n./<program name> <file name> <parameter>\n";
 		return 0;
 	}
 
@@ -35,18 +35,14 @@ int main(int argc, char *argv[])
 		cerr << "Error in reading the video file, please check the file and try again.\n";
 		return 0;
 	}
-	vector<Point2f> corners = getCorners(refFrame, "Select corners");
-	if (corners.size() != 4)
-	{
-		cerr << "Escape key pressed, aborting execution\n";
-		return 0;
-	}
+	vector<Point2f> corners({{998, 222}, {1268, 223}, {1520, 1015}, {384, 1015}});
 	vector<Point2f> cornersMap = findMap(corners);
+	cerr << "Press enter key\n";
+	imshow("", refFrame);
+	waitKey(0);
+	destroyAllWindows();
 	warpAndCrop(refFrame, corners, cornersMap);
-	int frameNum = 0, totFrames = video.get(CAP_PROP_FRAME_COUNT), x;
-
-	cerr << "Subsampling parameter: ";
-	cin >> x;
+	int frameNum = 0, totFrames = video.get(CAP_PROP_FRAME_COUNT), x = stoi(argv[2]);
 	auto t = chrono::high_resolution_clock::now();
 
 	cout << "time (in seconds),queue density\n";

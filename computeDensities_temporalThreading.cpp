@@ -36,9 +36,9 @@ int main(int argc, char *argv[])
 	cout.tie(NULL);
 
 	// check if file address present
-	if (argc != 2)
+	if (argc != 3)
 	{
-		cerr << "Required one additional argument:\n./main <file name>\n";
+		cerr << "Required two additional argument:\n./<program name> <file name> <parameter>\n";
 		return 0;
 	}
 
@@ -59,19 +59,16 @@ int main(int argc, char *argv[])
 		cerr << "Error in reading the video file, please check the file and try again.\n";
 		return 0;
 	}
-	ThreadArgs::corners = getCorners(ThreadArgs::refFrame, "Select corners");
-	if (ThreadArgs::corners.size() != 4)
-	{
-		cerr << "Escape key pressed, aborting execution\n";
-		return 0;
-	}
+	ThreadArgs::corners = vector<Point2f>({{998, 222}, {1268, 223}, {1520, 1015}, {384, 1015}});
 	ThreadArgs::cornersMap = findMap(ThreadArgs::corners);
+	cerr << "Press enter key\n";
+	imshow("", ThreadArgs::refFrame);
+	waitKey(0);
+	destroyAllWindows();
 	warpAndCrop(ThreadArgs::refFrame, ThreadArgs::corners, ThreadArgs::cornersMap);
 	int frameNum = 0, totFrames = video.get(CAP_PROP_FRAME_COUNT);
-	ThreadArgs::qVals.resize(totFrames);
-
-	cerr << "Number of threads: ";
-	cin >> ThreadArgs::NUM_THREADS;
+	ThreadArgs::qVals.resize(totFrames - 1);
+	ThreadArgs::NUM_THREADS = stoi(argv[2]);
 	auto t = chrono::high_resolution_clock::now();
 
 	pthread_t threads[ThreadArgs::NUM_THREADS];
@@ -87,7 +84,7 @@ int main(int argc, char *argv[])
 		for (int i = 0; i < min(totFrames - frameNum - 1, ThreadArgs::NUM_THREADS); ++i)
 		{
 			threadArgs[i].frame = getNextFrame(video);
-			threadArgs[i].frameNum = frameNum + i + 1;
+			threadArgs[i].frameNum = frameNum + i;
 			int rc = pthread_create(&threads[i], NULL, computeQueueThread, (void *)&threadArgs[i]);
 			if (rc)
 			{
@@ -108,7 +105,7 @@ int main(int argc, char *argv[])
 		frameNum += ThreadArgs::NUM_THREADS;
 	}
 
-	for (int i = 0; i < totFrames; ++i)
+	for (int i = 0; i < totFrames - 1; ++i)
 		cout << (i + 1) * 1.0 / fps << ',' << ThreadArgs::qVals[i] << '\n';
 
 	cout << "Time taken: " << chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - t).count() / 1000.0;
