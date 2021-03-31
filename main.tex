@@ -21,15 +21,17 @@ For any software, we need to consider a lot of aspects like accuracy, hardware r
 \subsection{Penalty Function}
 A penalty function is considered which takes into account both deviation in error and execution time into account.
 
-\textbf{Specifications:} The penalty function was made keeping in account that higher reduction in runtime leads to a larger error and hence, if the runtime reduction is more, the contribution of the error to the function should be reduced. The final function considered was:
+\textbf{Specifications:} The penalty function was made keeping in account that higher reduction in execution time leads to a larger error and hence, if the execution time reduction is more, the contribution of the error to the function should be reduced. The final function considered was:
 \begin{center}
-    $\ddfrac{1 + \mathit{mean}(\mathit{square}(10000\cdot\mathit{diff}(\mathit{queueDensityBaseline}, \mathit{queueDensityCurr})))}{1 + \frac{\mathit{baseRuntime} - \mathit{currentRuntime}}{\mathit{baseRuntime}}}$
+    $\ddfrac{1 + \mathit{mean}(\mathit{square}(10000\cdot\mathit{diff}(\mathit{queueDensityBaseline}, \mathit{queueDensityCurr})))}{1 + \frac{\mathit{baseExecutionTime} - \mathit{currentExecutionTime}}{\mathit{baseExecutionTime}}}$
 \end{center}
 Initially many variations were explored in which the numerator and denominator were raised to different powers, however, they led to highly similar graphs and not much difference was observed in the relative trends. Hence, the simple ratio was finally considered.
 
 \subsection{Runtime Metric}
-% @TODO :sadface
+Efficiency is one of the most important factors to consider while writing a program. Different programs have different order functions and hence there is a need to be able to compare different functions on the basis of the load they put on CPU and the time they take to run. Hence there arises a need to have a proper runtime metric.
+
 \textbf{Specifications:}
+We consider the time taken (in seconds) using $std::chrono$ for the program to run on the given video. The clock is started once the initial pre-processing is done and is stopped once the complete program is executed (after calculating and printing the values). To ensure uniformity across all runs of the code with different parameters, the system conditions were kept as constant as possible with the system on charging. Additionally, CPU usage was also monitored, where the percent usage of each core of the CPU was observed and the trends have been reported separately.
 
 
 \section{Methods}
@@ -45,7 +47,7 @@ Resolution reduction is performed to decrease the processing time of various fun
 Splitting work spatially by allotting different sections of every frame matrix to different threads is a lucrative method to spread the processing load. The reference frame is read and broken into $x$ segments which is stored in a struct. During the processing of each frame, the frame is directly passed to the thread functions, where based on the $thread\_id$, the corresponding segment is obtained and sum of the ``white pixels" obtained. In the same loop, the threads are joined and the values obtained are added and the result reported for that thread.
 
 \subsection{Temporal threading}
-This method involves reading multiple frames one after the other and then processing all of them at the same time. In a single iteration of the loop, $x$ frames are read and corresponding threads created and the frame passed to it. 
+This method involves reading multiple frames one after the other and then processing all of them at the same time. In a single iteration of the loop, $x$ frames are read and corresponding threads created and the frame passed to it. In the same iteration, the threads are combined so that they can be reused in the next iteration.
 
 \section{Trade-off analysis}
 While building a software, our purpose is to not only maximise the accuracy but also the other user and hardware specific features like latency in computation, temperature of the CPU unit and other hardware, security and privacy of data, etc. For this assignment, we have mainly considered the computation speed and accuracy for trade-off analysis.
@@ -81,7 +83,7 @@ In this method, multiple frames are processed at once, hence, the execution time
     \makebox[\textwidth]{\includegraphics[width=1.25\textwidth]{Graphs/temporalThreading.png}}
     Temporal threading graphs
 \end{center}
-Initially the execution time is larger compared to the baseline code since creating threads takes time. Also, the reduction in the execution time is clearly visible with a decrease in the number of threads. Additionally, the reduction in execution time gradually becomes lesser. Similar to spatial threading, the penalty function is dependent only on the runtime since the error is zero and hence the numerator equal to $1$. The most optimal parameter would be to use as many threads as possible that can be simultaneously processed by the computer ($12$ in the case of the device used to perform testing on).
+Initially the execution time is larger compared to the baseline code since creating threads takes time. Also, the reduction in the execution time is clearly visible with a decrease in the number of threads. Additionally, the reduction in execution time gradually becomes lesser. Similar to spatial threading, the penalty function is dependent only on the execution time since the error is zero and hence the numerator equal to $1$. The most optimal parameter would be to use as many threads as possible that can be simultaneously processed by the computer ($12$ in the case of the device used to perform testing on).
 
 \subsection{Note on CPU Usage}
 The execution of only the main function is not directly a single thread operation and the processor uses multiple threads even for a single thread code:
@@ -97,6 +99,4 @@ For a multi-threaded code, the CPU usage looks as follows:
 \end{center}
 Here, all the $12$ cores have a really high average CPU usage, over $80\%$, even though only $4+1$ (additional threads + main thread) threads were used. This can be possibly explained using the fact that the exact same set of cores is not used to create the threads, since breaking and joining of the threads happens multiple times throughout the code.
 
-% wow
 \end{document}
-%nice yay
