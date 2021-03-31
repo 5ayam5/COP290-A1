@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sys import argv
 
 modes = {'Subsampling': ["1.csv", "2.csv", "5.csv", "10.csv", "20.csv"],
          'Resolution': ["1_0.csv", "1_2.csv", "1_5.csv", "2_0.csv", "3_0.csv", "4_0.csv"],

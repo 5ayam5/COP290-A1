@@ -52,3 +52,20 @@ If everything has gone well till now, you will be able to see the first frame in
     2. `top left, top right, bottom left, bottom right`
 2. Press enter (or any key) to begin the density processing. The output will be stored in the csv file `outFileName.csv`.
 3. To view the plot, run the `plot.ipynb` jupyter notebook.
+
+# Subtask 3 #
+To run the program, do the following:
+## Step 1: Check Dependencies ##
+1. [CMake](https://cmake.org/install/)
+2. [OpenCV](https://docs.opencv.org/master/df/d65/tutorial_table_of_content_introduction.html)
+3. C++ Compiler
+
+## Step 2: Perform analysis ##
+Simply run:
+```
+>> ./run.sh
+```
+And input the parent directory `../analysis` when requested for input. The code for all the methods will be run and then the utility will also be evaluated.
+
+## Step 3: Plot the graphs ##
+To plot the graphs, run `plot.ipynb` (in the `analysis` folder) and enter the file address and then `1` or `0` if you want separate plots or not for the seaparate columns, respectively.
