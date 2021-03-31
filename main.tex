@@ -28,7 +28,7 @@ A penalty function is considered which takes into account both deviation in erro
 Initially many variations were explored in which the numerator and denominator were raised to different powers, however, they led to highly similar graphs and not much difference was observed in the relative trends. Hence, the simple ratio was finally considered.
 
 \subsection{Runtime Metric}
-Efficiency is one of the most important factors to consider while writing a program. Different programs have different order functions and hence there is a need to be able to compare different functions on the basis of the load they put on CPU and the time they take to run. Hence there arises a need to have a proper runtime metric.
+Efficiency is one of the most important factors to consider while writing a program. Different programs have different order functions and hence there is a need to be able to compare different functions on the basis of the load they put on CPU and the time they take to run. Thus there arises a need to have a proper runtime metric.
 
 \textbf{Specifications:}
 We consider the time taken (in seconds) using $std::chrono$ for the program to run on the given video. The clock is started once the initial pre-processing is done and is stopped once the complete program is executed (after calculating and printing the values). To ensure uniformity across all runs of the code with different parameters, the system conditions were kept as constant as possible with the system on charging. Additionally, CPU usage was also monitored, where the percent usage of each core of the CPU was observed and the trends have been reported separately.
