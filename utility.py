@@ -7,13 +7,15 @@ modes = {'Subsampling': ["1.csv", "2.csv", "5.csv", "10.csv", "20.csv"],
          'SpatialThreading': ["0.csv", "1.csv", "2.csv", "4.csv", "8.csv", "12.csv"],
          'TemporalThreading': ["0.csv", "1.csv", "2.csv", "4.csv", "8.csv", "12.csv"]}
 
+path = argv[1]
+
 for (mode, files) in modes.items():
-    base = pd.read_csv(mode + '/' + files[0])
+    base = pd.read_csv(path + '/' + mode + '/' + files[0])
     base_execution = float(base.values[-1][0].split(':')[1])
-    with open(mode + "/res.csv", 'w+') as f:
+    with open(path + '/' + mode + "/res.csv", 'w+') as f:
         f.write("Parameter,Penalty function,Execution time\n")
         for file in files[1:]:
-            csv = pd.read_csv(mode + '/' + file)
+            csv = pd.read_csv(path + '/' + mode + '/' + file)
             t = float(csv.values[-1][0].split(':')[1])
             execution = 1 + (base_execution - t) / base_execution
             err = 1 + np.square(10000 * np.subtract(

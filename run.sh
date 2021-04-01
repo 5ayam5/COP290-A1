@@ -39,4 +39,4 @@ echo TemporalThreading done!
 ./computeDensities_spatialThreading trafficvideo.mp4 12 > $dest/SpatialThreading/12.csv
 echo SpatialThreading done!
 
-python3 $dest/utility.py
+python3 $dest/utility.py $dest
